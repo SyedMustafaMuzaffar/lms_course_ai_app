@@ -1,5 +1,3 @@
-CREATE DATABASE IF NOT EXISTS lms_db;
-USE lms_db;
 
 -- Drop existing tables to ensure clean setup
 DROP TABLE IF EXISTS video_progress;
