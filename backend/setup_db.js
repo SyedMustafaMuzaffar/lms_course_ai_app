@@ -9,13 +9,19 @@ const setup = async () => {
         console.log('Connecting to MySQL...');
         connection = await mysql.createConnection({
             host: process.env.DB_HOST || 'localhost',
+            port: process.env.DB_PORT || 3306,
             user: process.env.DB_USER || 'root',
             password: process.env.DB_PASSWORD || 'password',
-            multipleStatements: true
+            multipleStatements: true,
+            ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined
         });
 
-        console.log('Creating database if not exists...');
-        await connection.query(`CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME || 'lms_db'};`);
+        console.log('Creating database if not exists (might be skipped on managed DBs)...');
+        try {
+            await connection.query(`CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME || 'lms_db'};`);
+        } catch (dbError) {
+            console.log('Skipping CREATE DATABASE (likely managed cloud database).');
+        }
         await connection.query(`USE ${process.env.DB_NAME || 'lms_db'};`);
 
         console.log('Reading schema.sql...');
